@@ -16,14 +16,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tr1ckydev/webview-bun.git"
+    "url": "git+https://github.com/nglmercer/webview-bun.git"
   },
   "keywords": [
     "bun",
     "webview",
-    "webview-bun"
+    "webview-bun",
+    "desktop",
+    "gui",
+    "ffi",
+    "native"
   ],
-  "author": "tr1ckydev",
+  "author": "nglmercer",
   "license": "MIT",
   "contributors": [
     "citkane",
@@ -31,9 +35,12 @@
     "StrangeBytesDev"
   ],
   "bugs": {
-    "url": "https://github.com/tr1ckydev/webview-bun/issues"
+    "url": "https://github.com/nglmercer/webview-bun/issues"
   },
-  "homepage": "https://github.com/tr1ckydev/webview-bun#readme",
+  "homepage": "https://github.com/nglmercer/webview-bun#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   }

@@ -1,4 +1,4 @@
-import { dlopen, FFIType, ptr, type Pointer, CString } from "bun:ffi";
+import { dlopen, FFIType, ptr, type Pointer } from "bun:ffi";
 import { Webview } from "./webview";
 
 export function encodeCString(value: string) {
@@ -112,59 +112,3 @@ export const lib = dlopen(lib_file.default, {
     returns: FFIType.i32,
   },
 });
-
-/**
- * Type definition for webview_set_browser_flags function.
- * This function may not exist in older library versions.
- */
-type WebviewSetBrowserFlagsFn = (
-  handle: Pointer,
-  enableAutoplay: number,
-  muteAutoplay: number,
-  customFlags: Pointer
-) => void;
-
-// Cache for browser flags support check
-let browserFlagsSupportChecked = false;
-let browserFlagsSupported = false;
-
-/**
- * Check if browser flags function is available in the library.
- * Returns false if the function doesn't exist (old library version).
- */
-export function hasBrowserFlagsSupport(): boolean {
-  if (browserFlagsSupportChecked) {
-    return browserFlagsSupported;
-  }
-  browserFlagsSupportChecked = true;
-  try {
-    //@ts-ignore - Dynamically check if symbol exists
-    const fn = lib.symbols.webview_set_browser_flags;
-    if (typeof fn === "function") {
-      browserFlagsSupported = true;
-      return true;
-    }
-  } catch {
-    // Symbol doesn't exist
-  }
-  browserFlagsSupported = false;
-  return false;
-}
-
-/**
- * Set browser flags - with fallback if not supported by the library.
- * This function safely calls webview_set_browser_flags if available,
- * otherwise does nothing.
- */
-export function setBrowserFlags(
-  handle: Pointer,
-  enableAutoplay: number,
-  muteAutoplay: number,
-  customFlagsPtr: Pointer
-): void {
-  if (hasBrowserFlagsSupport()) {
-    //@ts-ignore - Function exists at runtime
-    lib.symbols.webview_set_browser_flags(handle, enableAutoplay, muteAutoplay, customFlagsPtr);
-  }
-  // If not supported, silently ignore (for backwards compatibility)
-}

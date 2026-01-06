@@ -5,10 +5,7 @@ const { arch, platform } = process;
 
 switch (platform) {
   case "win32":
-    await $`
-        scripts/build.bat
-        cp webview/build/core/Release/webview.dll build/libwebview.dll
-        `;
+    await $`scripts/build.bat`;
     break;
   case "linux": {
     // Detect GTK version

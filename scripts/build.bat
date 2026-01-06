@@ -27,9 +27,25 @@ set WEBVIEW2_INCLUDE=%BUILD_ABS_PATH%\build\webview2_nuget\build\native\include
 
 REM Create include directory if it doesn't exist
 if not exist "%WEBVIEW2_INCLUDE%" (
-    echo ERROR: WebView2 headers not found at %WEBVIEW2_INCLUDE%
-    echo Please run: curl -L -o webview\nuget.zip https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/1.0.1150.38
-    echo        unzip -q nuget.zip -d build\webview2_nuget
+    echo WebView2 headers not found at %WEBVIEW2_INCLUDE%
+    echo Downloading WebView2 NuGet package...
+    powershell -Command "Invoke-WebRequest -Uri https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/1.0.1150.38 -OutFile nuget.zip"
+    if %ERRORLEVEL% neq 0 (
+        echo ERROR: Failed to download WebView2 package
+        exit /b 1
+    )
+    echo Extracting WebView2 NuGet package...
+    if not exist build mkdir build
+    powershell -Command "Expand-Archive -Path nuget.zip -DestinationPath build\webview2_nuget -Force"
+    if %ERRORLEVEL% neq 0 (
+        echo ERROR: Failed to extract WebView2 package
+        exit /b 1
+    )
+    del nuget.zip
+)
+
+if not exist "%WEBVIEW2_INCLUDE%" (
+    echo ERROR: WebView2 headers still not found at %WEBVIEW2_INCLUDE%
     exit /b 1
 )
 
@@ -67,10 +83,14 @@ echo.
 echo Build completed successfully!
 echo.
 
-if exist build\core\webviewd.dll (
-	echo Built library: build\core\webviewd.dll
+if exist build\core\webview.dll (
+	echo Built library: build\core\webview.dll
 	if not exist ..\build mkdir ..\build
-	copy /Y build\core\webviewd.dll ..\build\libwebview.dll
+	copy /Y build\core\webview.dll ..\build\libwebview.dll
+) else if exist build\core\Release\webview.dll (
+	echo Built library: build\core\Release\webview.dll
+	if not exist ..\build mkdir ..\build
+	copy /Y build\core\Release\webview.dll ..\build\libwebview.dll
 ) else (
 	echo ERROR: webview.dll was not found
 	exit /b 1

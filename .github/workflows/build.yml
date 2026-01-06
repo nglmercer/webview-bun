@@ -75,10 +75,7 @@ jobs:
         with:
           if-no-files-found: error
           name: ${{ matrix.os }}-${{ matrix.arch }}
-          path: |
-            ./build/libwebview-${{ matrix.arch }}.so
-            ./build/libwebview.dylib
-            ./build/libwebview.dll
+          path: ./build/libwebview*
 
   publish:
     name: Commit Binaries

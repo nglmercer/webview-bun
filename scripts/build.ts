@@ -1,5 +1,5 @@
 import { $ } from "bun";
-$.nothrow();
+// $.nothrow();
 
 const { arch, platform } = process;
 
@@ -10,12 +10,27 @@ switch (platform) {
         cp webview/build/core/Release/webview.dll build/libwebview.dll
         `;
     break;
-  case "linux":
+  case "linux": {
+    // Detect GTK version
+    const hasGtk4 = (await $`pkg-config --exists gtk4`.nothrow()).exitCode === 0;
+    let webkitApi = "4.0";
+    if (hasGtk4) {
+      webkitApi = "6.0";
+    } else {
+      const hasWebkit41 =
+        (await $`pkg-config --exists webkit2gtk-4.1`.nothrow()).exitCode === 0;
+      if (hasWebkit41) {
+        webkitApi = "4.1";
+      }
+    }
+
+    console.log(`Building for Linux (${arch}) using GTK ${hasGtk4 ? "4" : "3"} (WebKitAPI ${webkitApi})`);
+
     await $`
         cd webview
         cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Release \
-            -DWEBVIEW_WEBKITGTK_API=4.0 \
+            -DWEBVIEW_WEBKITGTK_API=${webkitApi} \
             -DWEBVIEW_ENABLE_CHECKS=false \
             -DWEBVIEW_BUILD_AMALGAMATION=false \
             -DWEBVIEW_BUILD_EXAMPLES=false \
@@ -28,6 +43,7 @@ switch (platform) {
         strip ../build/libwebview-${arch}.so
         `;
     break;
+  }
   case "darwin":
     await $`
         cd webview

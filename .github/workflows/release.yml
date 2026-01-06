@@ -87,10 +87,7 @@ jobs:
         with:
           if-no-files-found: error
           name: ${{ matrix.os }}-${{ matrix.arch }}
-          path: |
-            ./build/libwebview-*.so
-            ./build/libwebview.dylib
-            ./build/libwebview.dll
+          path: ./build/libwebview*
 
   publish:
     name: Publish to GitHub Releases

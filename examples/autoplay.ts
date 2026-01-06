@@ -80,11 +80,23 @@ const html = `
 </html>
 `;
 
-// Flags intended for WebView2 (Chromium)
-// --autoplay-policy=no-user-gesture-required: Bypasses the requirement for user interaction
-const flags = "--autoplay-policy=no-user-gesture-required";
+// Platform-specific flags:
+// - Windows (WebView2/Chromium): Uses Chromium flags
+// - Linux (WebKitGTK): Uses --enable-autoplay flag
+// - macOS (WebKit): Autoplay is enabled by default
+let flags = "";
 
-console.log("Starting webview with flags:", flags);
+if (process.platform === "win32") {
+  // WebView2 (Chromium) flags
+  flags = "--autoplay-policy=no-user-gesture-required";
+} else if (process.platform === "linux") {
+  // WebKitGTK flag to enable autoplay
+  flags = "--enable-autoplay";
+}
+// macOS (WebKit) doesn't need flags - autoplay is enabled by default
+
+console.log("Platform:", process.platform);
+console.log("Using flags:", flags);
 
 const webview = new Webview(
   true, // debug mode
@@ -119,3 +131,4 @@ webview.setHTML(html + `
 
 console.log("Webview is running. Check for autoplay status reports...");
 webview.run();
+

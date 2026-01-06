@@ -269,12 +269,12 @@ export class Webview {
       typeof debugOrHandle === "bigint" || typeof debugOrHandle === "number"
         ? debugOrHandle
         : flags
-        ? lib.symbols.webview_create_with_flags(
+          ? lib.symbols.webview_create_with_flags(
             Number(debugOrHandle),
             window,
             encodeCString(flags),
           )
-        : lib.symbols.webview_create(Number(debugOrHandle), window);
+          : lib.symbols.webview_create(Number(debugOrHandle), window);
     if (size !== undefined) this.size = size;
     instances.push(this);
   }
@@ -436,10 +436,10 @@ export class Webview {
       }
       if (result instanceof Promise) {
         result.then((r) =>
-          this.return(seq, success ? 0 : 1, JSON.stringify(r)),
+          this.return(seq, success ? 0 : 1, r === undefined ? "" : JSON.stringify(r)),
         );
       } else {
-        this.return(seq, success ? 0 : 1, JSON.stringify(result));
+        this.return(seq, success ? 0 : 1, result === undefined ? "" : JSON.stringify(result));
       }
     });
   }

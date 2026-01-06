@@ -54,6 +54,7 @@ echo Configuring CMake...
 echo.
 
 cmake -G Ninja -B build -S . ^
+	-DCMAKE_BUILD_TYPE=Release ^
 	-DWEBVIEW_ENABLE_CHECKS=false ^
 	-DWEBVIEW_BUILD_AMALGAMATION=false ^
 	-DWEBVIEW_BUILD_EXAMPLES=false ^
@@ -61,7 +62,7 @@ cmake -G Ninja -B build -S . ^
 	-DWEBVIEW_BUILD_TESTS=false ^
 	-DWEBVIEW_BUILD_DOCS=false ^
 	-DWEBVIEW_USE_BUILTIN_MSWEBVIEW2=OFF ^
-	-DCMAKE_CXX_FLAGS="-I%WEBVIEW2_INCLUDE%"
+	-DCMAKE_CXX_FLAGS="-I%WEBVIEW2_INCLUDE% /EHsc"
 
 if %ERRORLEVEL% neq 0 (
 	echo ERROR: CMake configuration failed
@@ -83,14 +84,22 @@ echo.
 echo Build completed successfully!
 echo.
 
+set "DLL_FOUND=0"
 if exist build\core\webview.dll (
-	echo Built library: build\core\webview.dll
-	if not exist ..\build mkdir ..\build
-	copy /Y build\core\webview.dll ..\build\libwebview.dll
+    set "DLL_PATH=build\core\webview.dll"
+    set "DLL_FOUND=1"
+) else if exist build\core\webviewd.dll (
+    set "DLL_PATH=build\core\webviewd.dll"
+    set "DLL_FOUND=1"
 ) else if exist build\core\Release\webview.dll (
-	echo Built library: build\core\Release\webview.dll
+    set "DLL_PATH=build\core\Release\webview.dll"
+    set "DLL_FOUND=1"
+)
+
+if "%DLL_FOUND%"=="1" (
+	echo Built library: %DLL_PATH%
 	if not exist ..\build mkdir ..\build
-	copy /Y build\core\Release\webview.dll ..\build\libwebview.dll
+	copy /Y "%DLL_PATH%" ..\build\libwebview.dll
 ) else (
 	echo ERROR: webview.dll was not found
 	exit /b 1

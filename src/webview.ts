@@ -143,6 +143,28 @@ export class Webview {
   }
 
   /**
+   * Sets whether the window should always be on top of other windows.
+   *
+   * ## Example
+   *
+   * ```ts
+   * import { Webview } from "webview-bun";
+   *
+   * const webview = new Webview();
+   * webview.navigate("https://bun.sh/");
+   *
+   * // Keep window on top
+   * webview.alwaysOnTop = true;
+   *
+   * webview.run();
+   * ```
+   */
+  set alwaysOnTop(value: boolean) {
+    //@ts-ignore
+    lib.symbols.webview_set_always_on_top(this.#handle, value ? 1 : 0);
+  }
+
+  /**
    * Enables click-through for transparent areas of the window.
    *
    * When enabled, clicks on transparent pixels will pass through the window

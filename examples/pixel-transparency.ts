@@ -144,13 +144,14 @@ const webview = new Webview(true, {
 });
 
 // Track current state
-let pixelTransparencyEnabled = true;
+let pixelTransparencyEnabled = false;
 let clickThroughEnabled = false;
 
 // Enable per-pixel transparency and click-through
 webview.transparency = pixelTransparencyEnabled;
 webview.clickThrough = clickThroughEnabled;
-
+webview.frame = false;
+webview.alwaysOnTop = true;
 webview.navigate(`data:text/html,${encodeURIComponent(html)}`);
 
 // Bind JavaScript functions
@@ -165,7 +166,6 @@ webview.bind("toggleClickThrough", () => {
 webview.bind("togglePixelTransparency", () => {
   pixelTransparencyEnabled = !pixelTransparencyEnabled;
   webview.transparency = pixelTransparencyEnabled;
-  webview.clickThrough = !pixelTransparencyEnabled;
   console.log(`Pixel transparency ${pixelTransparencyEnabled ? "enabled" : "disabled"}`);
   updateStatus();
   return { pixelTransparency: pixelTransparencyEnabled };

@@ -1,4 +1,4 @@
-import { dlopen, FFIType, ptr } from "bun:ffi";
+import { dlopen, FFIType, ptr, type Pointer } from "bun:ffi";
 import { Webview } from "./webview";
 
 export function encodeCString(value: string) {
@@ -84,6 +84,10 @@ export const lib = dlopen(lib_file.default, {
     returns: FFIType.void,
   },
   webview_set_pixel_transparency: {
+    args: [FFIType.ptr, FFIType.i32],
+    returns: FFIType.void,
+  },
+  webview_set_always_on_top: {
     args: [FFIType.ptr, FFIType.i32],
     returns: FFIType.void,
   },

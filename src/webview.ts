@@ -1,5 +1,5 @@
 import { CString, FFIType, JSCallback, type Pointer } from "bun:ffi";
-import { encodeCString, instances, lib } from "./ffi";
+import { encodeCString, instances, lib, setBrowserFlags } from "./ffi";
 
 /** Window size */
 export interface Size {
@@ -21,6 +21,32 @@ export const enum SizeHint {
   MAX,
   /** Window size can not be changed by a user */
   FIXED,
+}
+
+/**
+ * Browser configuration flags for controlling webview behavior.
+ * These flags are platform-specific and may not be supported on all platforms.
+ */
+export interface BrowserFlags {
+  /**
+   * Enable autoplay for audio/video without user gesture.
+   * - Windows: Uses --autoplay-policy=no-user-gesture-required
+   * - macOS: Sets mediaTypesRequiringUserActionForPlayback to none
+   * - Linux: Sets media_playback_requires_user_gesture to false
+   */
+  enableAutoplay?: boolean;
+  /**
+   * Mute audio by default when autoplay is enabled.
+   */
+  muteAutoplay?: boolean;
+  /**
+   * Custom browser flags to pass to the underlying browser engine.
+   * Format: ["--flag1=value1", "--flag2=value2"]
+   * - Windows: Passed as AdditionalBrowserArguments
+   * - macOS: Not directly supported, converted to equivalent WKWebView settings
+   * - Linux: Applied as WebKitSettings
+   */
+  customFlags?: string[];
 }
 
 /** An instance of a webview window.*/
@@ -213,6 +239,37 @@ export class Webview {
     lib.symbols.webview_set_title(this.#handle, encodeCString(title));
   }
 
+  /**
+   * Sets browser configuration flags for the webview.
+   *
+   * ## Example
+   *
+   * ```ts
+   * import { Webview } from "webview-bun";
+   *
+   * const webview = new Webview();
+   * webview.navigate("https://example.com/video.html");
+   *
+   * // Enable autoplay for audio/video
+   * webview.setBrowserFlags({ enableAutoplay: true });
+   *
+   * webview.run();
+   * ```
+   *
+   * Note: For best results, pass flags in the constructor. This method may not
+   * work on Windows/macOS for autoplay because browser flags must be set before
+   * creating the webview. For Linux, this works correctly.
+   *
+   * @param flags Browser configuration flags
+   */
+  setBrowserFlags(flags: BrowserFlags) {
+    if (!this.#handle) return;
+    const enableAutoplay = flags.enableAutoplay ? 1 : 0;
+    const muteAutoplay = flags.muteAutoplay ? 1 : 0;
+    const customFlags = flags.customFlags?.join(",") || "";
+    setBrowserFlags(this.#handle, enableAutoplay, muteAutoplay, encodeCString(customFlags));
+  }
+
   /** **UNSAFE**: Highly unsafe API, beware!
    *
    * Creates a new webview instance from a webview handle.
@@ -253,6 +310,36 @@ export class Webview {
    * here.
    */
   constructor(debug?: boolean, size?: Size, window?: Pointer | null);
+  /**
+   * Creates a new webview instance with browser flags.
+   *
+   * ## Example
+   *
+   * ```ts
+   * import { Webview } from "webview-bun";
+   *
+   * // Create a webview with autoplay enabled
+   * const webview = new Webview(true, undefined, null, {
+   *   enableAutoplay: true,
+   *   customFlags: ["--some-flag=value"]
+   * });
+   *
+   * webview.navigate("https://example.com/video.html");
+   * webview.run();
+   * ```
+   *
+   * @param debug Defaults to false, when true developer tools are enabled
+   * for supported platforms
+   * @param size The window size, default to 1024x768 with no size hint
+   * @param window **UNSAFE**: Native window handle
+   * @param flags Browser configuration flags (optional)
+   */
+  constructor(
+    debug?: boolean,
+    size?: Size,
+    window?: Pointer | null,
+    flags?: BrowserFlags
+  );
   constructor(
     debugOrHandle: boolean | Pointer = false,
     size: Size | undefined = {
@@ -261,6 +348,7 @@ export class Webview {
       hint: SizeHint.NONE,
     },
     window: Pointer | null = null,
+    flags?: BrowserFlags,
   ) {
     this.#handle =
       typeof debugOrHandle === "bigint" || typeof debugOrHandle === "number"
@@ -268,6 +356,10 @@ export class Webview {
         : lib.symbols.webview_create(Number(debugOrHandle), window);
     if (size !== undefined) this.size = size;
     instances.push(this);
+    // Apply browser flags if provided
+    if (flags && this.#handle && typeof debugOrHandle !== "bigint" && typeof debugOrHandle !== "number") {
+      this.setBrowserFlags(flags);
+    }
   }
 
   /**

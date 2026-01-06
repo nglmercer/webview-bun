@@ -150,7 +150,7 @@ let clickThroughEnabled = false;
 // Enable per-pixel transparency and click-through
 webview.transparency = pixelTransparencyEnabled;
 webview.clickThrough = clickThroughEnabled;
-webview.frame = false;
+webview.frame = true;
 webview.alwaysOnTop = true;
 webview.navigate(`data:text/html,${encodeURIComponent(html)}`);
 
@@ -178,25 +178,11 @@ function updateStatus() {
   `);
 }
 
-// Initialize JavaScript
-webview.init(`
-  window.toggleClickThrough = async () => {
-    await toggleClickThrough();
-  };
 
-  window.togglePixelTransparency = async () => {
-    await togglePixelTransparency();
-  };
+// Bound functions are already available globally, no need to wrap them
+webview.init(`
+  console.log('Pixel transparency example initialized');
 `);
 
 console.log("Pixel Transparency Demo");
-console.log("========================");
-console.log("This example demonstrates:");
-console.log("1. Per-pixel transparency using UpdateLayeredWindow");
-console.log("2. Click-through for transparent areas");
-console.log("3. Real-time toggling of features");
-console.log("");
-console.log("Try clicking on the transparent areas around the circle!");
-console.log("The clicks should pass through to windows behind this one.");
-
 webview.runNonBlocking();

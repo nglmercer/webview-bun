@@ -13,17 +13,18 @@ switch (platform) {
   case "linux":
     await $`
         cd webview
-        cmake -G "Ninja Multi-Config" -B build -S . \
-            -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/host-llvm.cmake \
-            -DWEBVIEW_WEBKITGTK_API=6.0 \
+        cmake -B build -S . \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DWEBVIEW_WEBKITGTK_API=4.0 \
             -DWEBVIEW_ENABLE_CHECKS=false \
             -DWEBVIEW_BUILD_AMALGAMATION=false \
             -DWEBVIEW_BUILD_EXAMPLES=false \
             -DWEBVIEW_BUILD_STATIC_LIBRARY=false \
             -DWEBVIEW_BUILD_TESTS=false \
             -DWEBVIEW_BUILD_DOCS=false
-        cmake --build build --config Release
-        cp build/core/Release/libwebview.so ../build/libwebview-${arch}.so
+        cmake --build build
+        mkdir -p ../build
+        cp build/core/libwebview.so ../build/libwebview-${arch}.so
         strip ../build/libwebview-${arch}.so
         `;
     break;

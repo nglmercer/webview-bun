@@ -35,6 +35,10 @@ export const lib = dlopen(lib_file.default, {
     args: [FFIType.i32, FFIType.ptr],
     returns: FFIType.ptr,
   },
+  webview_create_with_flags: {
+    args: [FFIType.i32, FFIType.ptr, FFIType.ptr],
+    returns: FFIType.ptr,
+  },
   webview_destroy: {
     args: [FFIType.ptr],
     returns: FFIType.void,

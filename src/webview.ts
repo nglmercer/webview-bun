@@ -251,8 +251,10 @@ export class Webview {
    * the given parent window. Otherwise a new window is created. Depending on
    * the platform, a `GtkWindow`, `NSWindow` or `HWND` pointer can be passed
    * here.
+   * @param flags Custom browser flags as a comma-separated string (e.g. "--disable-web-security,--remote-debugging-port=9222").
+   * Supported flags depend on the backend (e.g. WebView2, WebKitGTK).
    */
-  constructor(debug?: boolean, size?: Size, window?: Pointer | null);
+  constructor(debug?: boolean, size?: Size, window?: Pointer | null, flags?: string);
   constructor(
     debugOrHandle: boolean | Pointer = false,
     size: Size | undefined = {
@@ -261,10 +263,17 @@ export class Webview {
       hint: SizeHint.NONE,
     },
     window: Pointer | null = null,
+    flags?: string,
   ) {
     this.#handle =
       typeof debugOrHandle === "bigint" || typeof debugOrHandle === "number"
         ? debugOrHandle
+        : flags
+        ? lib.symbols.webview_create_with_flags(
+            Number(debugOrHandle),
+            window,
+            encodeCString(flags),
+          )
         : lib.symbols.webview_create(Number(debugOrHandle), window);
     if (size !== undefined) this.size = size;
     instances.push(this);

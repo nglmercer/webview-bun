@@ -1,6 +1,14 @@
 import { Webview } from "../src";
 
-const html = `
+const html = /* html */ `
+<head>
+    <style>
+        body {
+            color: white !important;
+            background: transparent;
+        }
+    </style>
+</head>
 <html>
     <body>
         <h1>Hello from bun v${Bun.version} !</h1>
@@ -8,7 +16,7 @@ const html = `
 </html>
 `;
 
-const webview = new Webview();
+const webview = new Webview(true);
 webview.title = "Bun App";
 webview.setHTML(html);
 webview.run();

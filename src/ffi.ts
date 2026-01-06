@@ -75,6 +75,22 @@ export const lib = dlopen(lib_file.default, {
     args: [FFIType.ptr, FFIType.ptr],
     returns: FFIType.void,
   },
+  webview_set_frame: {
+    args: [FFIType.ptr, FFIType.i32],
+    returns: FFIType.void,
+  },
+  webview_set_opacity: {
+    args: [FFIType.ptr, FFIType.f64],
+    returns: FFIType.void,
+  },
+  webview_set_pixel_transparency: {
+    args: [FFIType.ptr, FFIType.i32],
+    returns: FFIType.void,
+  },
+  webview_set_click_through: {
+    args: [FFIType.ptr, FFIType.i32],
+    returns: FFIType.void,
+  },
   webview_bind: {
     args: [FFIType.ptr, FFIType.ptr, FFIType.function, FFIType.ptr],
     returns: FFIType.void,

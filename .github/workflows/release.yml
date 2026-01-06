@@ -8,12 +8,12 @@ on:
   workflow_dispatch:
     inputs:
       create_release:
-        description: 'Create a new GitHub release'
+        description: "Create a new GitHub release"
         required: true
         type: boolean
         default: true
       release_tag:
-        description: 'Release tag (e.g., v2.4.0)'
+        description: "Release tag (e.g., v2.4.0)"
         required: false
         type: string
 
@@ -128,17 +128,17 @@ jobs:
           name: Release ${{ inputs.release_tag || steps.version.outputs.tag }}
           body: |
             ## Webview Bun Binaries
-            
+
             This release contains pre-built webview binaries for multiple platforms:
             - Linux x64 (libwebview-x64.so)
             - Linux ARM64 (libwebview-arm64.so)
             - macOS ARM64 (libwebview.dylib)
             - Windows x64 (libwebview.dll)
-            
+
             ### Installation
-            
+
             Download the binary for your platform and place it in the `build/` directory of your project.
-            
+
             ### Built with
             - Bun v1.2.15
             - webview library (https://github.com/webview/webview)

@@ -74,6 +74,103 @@ export class Webview {
   }
 
   /**
+   * Sets the window frame (decorations)
+   *
+   * ## Example
+   *
+   * ```ts
+   * import { Webview } from "webview-bun";
+   *
+   * const webview = new Webview();
+   * webview.navigate("https://bun.sh/");
+   *
+   * // Remove window decorations (title bar, borders)
+   * webview.frame = false;
+   *
+   * webview.run();
+   * ```
+   */
+  set frame(value: boolean) {
+    //@ts-ignore
+    lib.symbols.webview_set_frame(this.#handle, value ? 1 : 0);
+  }
+
+  /**
+   * Sets the window opacity level
+   *
+   * ## Example
+   *
+   * ```ts
+   * import { Webview } from "webview-bun";
+   *
+   * const webview = new Webview();
+   * webview.navigate("https://bun.sh/");
+   *
+   * // Set window to 50% opacity
+   * webview.opacity = 0.5;
+   *
+   * webview.run();
+   * ```
+   */
+  set opacity(value: number) {
+    //@ts-ignore
+    lib.symbols.webview_set_opacity(this.#handle, value);
+  }
+
+  /**
+   * Enables per-pixel transparency for the window.
+   *
+   * This uses UpdateLayeredWindow to achieve true per-pixel alpha transparency.
+   * The HTML content should have transparent areas (black pixels will be transparent).
+   *
+   * ## Example
+   *
+   * ```ts
+   * import { Webview } from "webview-bun";
+   *
+   * const webview = new Webview();
+   * webview.navigate("data:text/html,<html><body style='background:transparent'><div style='background:red;border-radius:10px'>Hello</div></body></html>");
+   *
+   * // Enable per-pixel transparency
+   * webview.transparency = true;
+   *
+   * webview.run();
+   * ```
+   */
+  set transparency(value: boolean) {
+    //@ts-ignore
+    lib.symbols.webview_set_pixel_transparency(this.#handle, value ? 1 : 0);
+  }
+
+  /**
+   * Enables click-through for transparent areas of the window.
+   *
+   * When enabled, clicks on transparent pixels will pass through the window
+   * to underlying windows. This is useful for creating irregularly shaped windows
+   * where the transparent areas should not intercept mouse clicks.
+   * Requires per-pixel transparency to be enabled for best results.
+   *
+   * ## Example
+   *
+   * ```ts
+   * import { Webview } from "webview-bun";
+   *
+   * const webview = new Webview();
+   * webview.navigate("data:text/html,<html><body style='background:transparent'><div style='background:red;border-radius:10px'>Click through transparent areas!</div></body></html>");
+   *
+   * // Enable per-pixel transparency
+   * webview.transparency = true;
+   * webview.clickThrough = true;
+   *
+   * webview.run();
+   * ```
+   */
+  set clickThrough(value: boolean) {
+    //@ts-ignore
+    lib.symbols.webview_set_click_through(this.#handle, value ? 1 : 0);
+  }
+
+  /**
    * Sets the native window title
    *
    * ## Example
@@ -195,7 +292,7 @@ export class Webview {
   }
 
   /**
-   * Run without blocking Bun’s event‑loop.
+   * Run without blocking Bun's event‑loop.
    * @param onClose A callback for when the webview is closed.
    */
   runNonBlocking(onClose?: () => void): void {
@@ -203,7 +300,7 @@ export class Webview {
       if (this.pump(false)) setTimeout(step, 0);
       else {
         this.destroy();
-        onClose?.()
+        onClose?.();
       }
     };
     step();
